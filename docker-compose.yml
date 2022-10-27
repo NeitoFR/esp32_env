@@ -1,0 +1,50 @@
+version: "3.8"
+
+services: 
+  portainer:
+    container_name: portainer
+    hostname: portainer
+    image: portainer/portainer-ce:latest
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports: 
+      - 9000:9000
+
+  grafana:
+    container_name: grafana
+    hostname: grafana
+    image: grafana/grafana:9.2.2
+    volumes:
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - grafana-data:/var/lib/grafana
+    ports: 
+      - 9001:3000
+
+  mqtt:
+    container_name: mqtt
+    hostname: mqtt
+    image: eclipse-mosquitto:2.0.15
+    volumes:
+      - ./mqtt/config/:/mosquitto/config/
+      - ./mqtt/log/:/mosquitto/log/
+      # - data:/mosquitto/data/
+    ports: 
+      - 1883:1883
+
+  influxdb:
+    container_name: influxdb
+    hostname: influxdb
+    image: influxdb:latest
+    ports:
+      - '8086:8086'
+    volumes:
+      - influxdb-storage:/var/lib/influxdb
+    environment:
+      - INFLUXDB_DB=esp_db
+      - INFLUXDB_ADMIN_USER=admin
+      - INFLUXDB_ADMIN_PASSWORD=tructruc123
+
+volumes:
+  grafana-data:
+  influxdb-storage:
